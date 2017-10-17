@@ -1,8 +1,9 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-require 'pry'
+require 'everypolitician'
 require 'wikidata/fetcher'
+require 'pry'
 
 sparq = <<EOS
   SELECT ?item
@@ -14,5 +15,7 @@ sparq = <<EOS
 EOS
 ids = EveryPolitician::Wikidata.sparql(sparq)
 
+existing = EveryPolitician::Index.new.country("Ukraine").lower_house.popolo.persons.map(&:wikidata).compact
+
 names = EveryPolitician::Wikidata.morph_wikinames(source: 'tmtmtmtm/ukraine-deputies-wikipedia', column: 'wikiname')
-EveryPolitician::Wikidata.scrape_wikidata(ids: ids, names: { uk: names })
+EveryPolitician::Wikidata.scrape_wikidata(ids: ids | existing, names: { uk: names })
